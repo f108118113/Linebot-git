@@ -1,0 +1,14 @@
+[line]
+channel_access_token = wQUjqRaNdW0BaZ+wZ3NoneIJ1i5lUrYlC5TSlLdJ6DQH8wydsyNLmvtam/YfiRJDxQvANtUXQxouQkpg89ckki+EvoejORVRLEWCQplhjCONq+1/GXNWlYZz3J6O7S+gDi/BOyoS27LjJ7kGRX3qRQdB04t89/1O/w1cDnyilFU=
+channel_secret = c21733824b3b713b7d38af8533744af3
+
+[Web]
+account = phamvinh@kienminhhcm.com.vn
+password = abcd456789
+
+[SQL]
+db_settings = {
+"host": "127.0.0.1",
+"user": "yt",
+"password": "C217_yt",
+"db": "DG_DB",}
