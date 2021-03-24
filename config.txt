@@ -1,0 +1,22 @@
+[line]
+channel_access_token = jNvM5rc41vD+Y0f63nlYFiNdIhTyvJaMz0wqw9ZXeaR++i+tdK1BldIn9UDp/RTHptAaNrHylDyeCXYpB8fMALc/u3c/pTwasBpTzKkC7pKWy3CpJTQCb3dOr3dTp1bak5dGWmTMlDPAdN7FQXfAogdB04t89/1O/w1cDnyilFU=
+channel_secret = 0fb41bb44eab2eba0458cff82a208b15
+
+[WebLogin]
+account = phamvinh@kienminhhcm.com.vn
+password = abcd456789
+
+[WebAddress]
+website = https://smartgen.iot366.com/
+parseWeb = https://smartgen.iot366.com/monitor/toXxsj?unitId=5843&token=b4a0e0fbaa9f16d8947c49f4e610b549
+parseWeb2 = http://www.smartgencloud.com/unlogin/toXxsjH5?unitId=6226
+parseWeb3 = http://www.smartgencloud.com/unlogin/toXxsjH5?unitId=2027
+
+[SQL]
+host = 127.0.0.1
+user = yt
+password = C217_yt
+db = DG_DB
+
+[SQLengine]
+engine = mysql+pymysql://yt:C217_yt@127.0.0.1:3306/DG_DB
