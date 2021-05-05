@@ -40,7 +40,7 @@ chrome = webdriver.Chrome(chrome_options=chrome_options)
 # LINEbot config
 def config_data(section, item):
     proDir = os.path.split(os.path.realpath(__file__))[0]
-    configPath = os.path.join(proDir, "config.txt")
+    configPath = os.path.join(proDir, "config/config.txt")
     path = os.path.abspath(configPath)
     config = configparser.ConfigParser()
     config.read(path)
@@ -49,7 +49,8 @@ def config_data(section, item):
 # Login web
 def log_in():
     try:    
-        chrome.get("https://smartgen.iot366.com/")
+        url = config_data('WebAddress','website')
+        chrome.get(url)
         email = chrome.find_element_by_id("user-account")
         password = chrome.find_element_by_id("password")
         email.send_keys(config_data('WebLogin', 'account'))
@@ -157,16 +158,11 @@ def handle_message(event):
             sql = 'select statement from errorcodelist WHERE errorcode = %s'
             cursor.execute(sql, reply)
             message = cursor.fetchone()[0]
-            print(message)
-            print(type(message))
             message = "原因為:{}".format(message)
-            print(type(message))
-            print(message)
             connection.commit()
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
             message = TextSendMessage(text = message)
-            print(type(message))
-            print(message)
+            #print(message)
             line_bot_api.reply_message(event.reply_token, message )
 
     if cmd[0] == "解決方式" :
@@ -176,15 +172,11 @@ def handle_message(event):
             sql = 'select method from errorcodelist WHERE errorcode = %s'
             cursor.execute(sql, reply)
             message = cursor.fetchone()[0]
-            print(message)
-            print(type(message))
             message = "解決方式為:{}".format(message) # ubuntu 18 String CANNOT USE A+B 
-            print(type(message))
-            print(message)
             connection.commit()
             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
             message = TextSendMessage(text = message)
-            print(message)
+            #print(message)
             line_bot_api.reply_message(event.reply_token, message )
 
     message = TextSendMessage(text="請輸入即時報表 機台號碼、錯誤代碼 代碼編號、解決方式 代碼編號，例如：即時報表 6226")
