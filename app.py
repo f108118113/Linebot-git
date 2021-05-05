@@ -153,7 +153,7 @@ def handle_message(event):
     if cmd[0] == "錯誤代碼" :    
         reply = cmd[1]
         with connection.cursor() as cursor:
-            # 執行sql語句，插入記錄
+            # execute sql and instert data
             sql = 'select statement from errorcodelist WHERE errorcode = %s'
             cursor.execute(sql, reply)
             message = cursor.fetchone()[0]
