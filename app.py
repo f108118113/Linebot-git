@@ -192,10 +192,11 @@ def handle_message(event):
 
 
 
-ssl_crt = config_data('SSL', 'ca')
-ssl_key = config_data('SSL', 'key')
+
 
 if __name__ == "__main__":
+    ssl_crt = config_data('SSL', 'ca')
+    ssl_key = config_data('SSL', 'key')
     #port = int(os.environ.get('PORT', 5000))
     #app.run(host='0.0.0.0', port=port)
     hostname = config_data('DomainName','DN')
