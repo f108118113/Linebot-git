@@ -20,17 +20,10 @@ import pyimgur
 import pymysql
 
 
+
 app = Flask(__name__)
 
-
-#columns=['Mains_Bus', 'Mains_Bus2', 'Generator', 'Generator2', 'Engine', 'Engine2', 'I_O', 'I_O2']
-# schedule = sched.scheduler(time.time, time.sleep)
-
-
-
 # Create chrome driver 
-options = Options()
-options.add_argument("--disable-notifications")
 chrome_options = Options() 
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
@@ -131,6 +124,16 @@ def callback():
 # reply message
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    # get user id when reply
+    user_id = event.source.user_id
+    print("user_id =", user_id)
+
+    try:
+        line_bot_api.push_message(user_id, TextSendMessage(text='你好'))
+    except InvalidSignatureError as e:
+    # error handle
+        raise e
+
     cmd = event.message.text.split(" ")
     if cmd[0] == "即時報表" :
         if cmd[1] == "6226":
