@@ -4,7 +4,7 @@ import os
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage,ImageSendMessage,JoinEvent,LeaveEvent
+from linebot.models import *
 import configparser
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -124,67 +124,160 @@ def callback():
 # reply message
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    if event.message.text == "登入身分":
+        buttons_template = TemplateSendMessage(
+            alt_text='登入身分 template',
+            template=ButtonsTemplate(
+                title='選擇服務',
+                text='請選擇',
+                thumbnail_image_url='https://i.imgur.com/lMgCjWK.jpg',
+                actions=[
+                    MessageTemplateAction(
+                        label='工程師',
+                        text='工程師'
+                    ),
+                    MessageTemplateAction(
+                        label='使用者',
+                        text='使用者'
+                    ),
+                    MessageTemplateAction(
+                        label='廠商',
+                        text='廠商'
+                    ),
+                    
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, buttons_template)
+        return 0    
+    carousel_template_message = TemplateSendMessage(
+        alt_text='目錄 template',
+        template=CarouselTemplate(
+            columns=[
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
+                    title='登入身分',
+                    text='請選擇',
+                    actions=[
+                        MessageAction(
+                            label='工程師',
+                            text='工程師'
+                        ),
+                        MessageAction(
+                            label='使用者',
+                            text='使用者'
+                        ),
+                        MessageAction(
+                            label='廠商',
+                            text='廠商'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
+                    title='故障排除',
+                    text='請選擇',
+                    actions=[
+                        MessageAction(
+                            label='柴油發電機型號',
+                            text='柴油發電機型號'
+                        ),
+                        MessageAction(
+                            label='錯誤代碼查詢',
+                            text='錯誤代碼查詢'
+                        ),
+                        MessageAction(
+                            label='解決方式查詢',
+                            text='解決方式查詢'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
+                    title='關於我們',
+                    text='請選擇',
+                    actions=[
+                        URIAction(
+                            label='分享 bot',
+                            uri='https://line.me/R/nv/recommendOA/@425mwzuz'
+                        ),
+                        URIAction(
+                            label='聯絡開發者',
+                            uri='https://github.com/f108118113'
+                        ),
+                        URIAction(
+                            label='聯絡客服',
+                            uri='https://github.com/f108118113'
+                        )
+                    ]
+                )
+            ]
+        )
+    )
+
+    line_bot_api.reply_message(event.reply_token, carousel_template_message)
+
+
     # get user id when reply
-    user_id = event.source.user_id
-    print("user_id =", user_id)
+    # user_id = event.source.user_id
+    # print("user_id =", user_id)
 
-    try:
-        line_bot_api.push_message(user_id, TextSendMessage(text='你好'))
-    except InvalidSignatureError as e:
-    # error handle
-        raise e
+    # try:
+    #     line_bot_api.push_message(user_id, TextSendMessage(text='你好'))
+    # except InvalidSignatureError as e:
+    # # error handle
+    #     raise e
 
-    cmd = event.message.text.split(" ")
-    if cmd[0] == "即時報表" :
-        if cmd[1] == "6226":
-            parseWeb = config_data('Web6226','parseWeb')
-            web_id = config_data('Web6226','web_id')
-            image_name = crawl_and_save(parseWeb,web_id)
-            url = upload_image(web_id + ".png")
-            line_bot_api.reply_message(event.reply_token,ImageSendMessage(original_content_url=url, preview_image_url=url))
+    # cmd = event.message.text.split(" ")
+    # if cmd[0] == "即時報表" :
+    #     if cmd[1] == "6226":
+    #         parseWeb = config_data('Web6226','parseWeb')
+    #         web_id = config_data('Web6226','web_id')
+    #         image_name = crawl_and_save(parseWeb,web_id)
+    #         url = upload_image(web_id + ".png")
+    #         line_bot_api.reply_message(event.reply_token,ImageSendMessage(original_content_url=url, preview_image_url=url))
     
-        if cmd[1] == "2027":
-            parseWeb = config_data('Web2027','parseWeb')
-            web_id = config_data('Web2027','web_id')
-            image_name = crawl_and_save(parseWeb,web_id)
-            url = upload_image(web_id + ".png")
-            line_bot_api.reply_message(event.reply_token,ImageSendMessage(original_content_url=url, preview_image_url=url))
+    #     if cmd[1] == "2027":
+    #         parseWeb = config_data('Web2027','parseWeb')
+    #         web_id = config_data('Web2027','web_id')
+    #         image_name = crawl_and_save(parseWeb,web_id)
+    #         url = upload_image(web_id + ".png")
+    #         line_bot_api.reply_message(event.reply_token,ImageSendMessage(original_content_url=url, preview_image_url=url))
 
-        else:
-            replayMsg = "沒有這個機台"
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=replayMsg))
+    #     else:
+    #         replayMsg = "沒有這個機台"
+    #         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=replayMsg))
 
-    if cmd[0] == "錯誤代碼" :    
-        reply = cmd[1]
-        with connection.cursor() as cursor:
-            # execute sql and instert data
-            sql = 'select statement from errorcodelist WHERE errorcode = %s'
-            cursor.execute(sql, reply)
-            message = cursor.fetchone()[0]
-            message = "原因為:{}".format(message)
-            connection.commit()
-            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
-            message = TextSendMessage(text = message)
-            #print(message)
-            line_bot_api.reply_message(event.reply_token, message )
+    # if cmd[0] == "錯誤代碼" :    
+    #     reply = cmd[1]
+    #     with connection.cursor() as cursor:
+    #         # execute sql and instert data
+    #         sql = 'select statement from errorcodelist WHERE errorcode = %s'
+    #         cursor.execute(sql, reply)
+    #         message = cursor.fetchone()[0]
+    #         message = "原因為:{}".format(message)
+    #         connection.commit()
+    #         #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
+    #         message = TextSendMessage(text = message)
+    #         #print(message)
+    #         line_bot_api.reply_message(event.reply_token, message )
 
-    if cmd[0] == "解決方式" :
-        reply = cmd[1]
-        with connection.cursor() as cursor:
-            # execute sql command, and insert record
-            sql = 'select method from errorcodelist WHERE errorcode = %s'
-            cursor.execute(sql, reply)
-            message = cursor.fetchone()[0]
-            message = "解決方式為:{}".format(message) # ubuntu 18 String CANNOT USE A+B 
-            connection.commit()
-            #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
-            message = TextSendMessage(text = message)
-            #print(message)
-            line_bot_api.reply_message(event.reply_token, message )
+    # if cmd[0] == "解決方式" :
+    #     reply = cmd[1]
+    #     with connection.cursor() as cursor:
+    #         # execute sql command, and insert record
+    #         sql = 'select method from errorcodelist WHERE errorcode = %s'
+    #         cursor.execute(sql, reply)
+    #         message = cursor.fetchone()[0]
+    #         message = "解決方式為:{}".format(message) # ubuntu 18 String CANNOT USE A+B 
+    #         connection.commit()
+    #         #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
+    #         message = TextSendMessage(text = message)
+    #         #print(message)
+    #         line_bot_api.reply_message(event.reply_token, message )
 
-    message = TextSendMessage(text="請輸入即時報表 機台號碼、錯誤代碼 代碼編號、解決方式 代碼編號，例如：即時報表 6226")
-    line_bot_api.reply_message(event.reply_token, message )
-
+    # message = TextSendMessage(text="請輸入即時報表 機台號碼、錯誤代碼 代碼編號、解決方式 代碼編號，例如：即時報表 6226")
+    # line_bot_api.reply_message(event.reply_token, message )
 
 
 
