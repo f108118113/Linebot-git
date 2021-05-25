@@ -121,31 +121,42 @@ def callback():
         abort(400)
     return 'OK'
 
+
+
 # reply message
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    cmd = event.message.text.split(" ")
+    #if (len(cmd)) == 1:
+    if event.message.text == "故障排除":
+        buttons_template = TemplateSendMessage(
+            alt_text='故障排除 template',
+            template=ButtonsTemplate(
+                title='故障排除',
+                text='請選擇',
+                thumbnail_image_url='https://i.imgur.com/lMgCjWK.jpg',
+                actions=[
+                    MessageTemplateAction(label='柴油發電機型號',text='柴油發電機型號'),
+                    MessageTemplateAction(label='錯誤代碼查詢',text='錯誤代碼查詢'),
+                    MessageTemplateAction(label='常見問題',text='常見問題')
+                    
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, buttons_template)
+        return 0
     if event.message.text == "登入身分":
         buttons_template = TemplateSendMessage(
             alt_text='登入身分 template',
             template=ButtonsTemplate(
-                title='選擇服務',
+                title='登入身分',
                 text='請選擇',
                 thumbnail_image_url='https://i.imgur.com/lMgCjWK.jpg',
                 actions=[
-                    MessageTemplateAction(
-                        label='工程師',
-                        text='工程師'
-                    ),
-                    MessageTemplateAction(
-                        label='使用者',
-                        text='使用者'
-                    ),
-                    MessageTemplateAction(
-                        label='廠商',
-                        text='廠商'
-                    ),
-                    
-                ]
+                        URIAction(label='工程師',uri='https://dglinebot.54ucl.com:5000/'),
+                        URIAction(label='使用者',uri='https://dglinebot.54ucl.com:5000/'),
+                        URIAction(label='廠商',uri='https://dglinebot.54ucl.com:5000/')
+                    ]
             )
         )
         line_bot_api.reply_message(event.reply_token, buttons_template)
@@ -159,55 +170,29 @@ def handle_message(event):
                     title='登入身分',
                     text='請選擇',
                     actions=[
-                        MessageAction(
-                            label='工程師',
-                            text='工程師'
-                        ),
-                        MessageAction(
-                            label='使用者',
-                            text='使用者'
-                        ),
-                        MessageAction(
-                            label='廠商',
-                            text='廠商'
-                        )
+                        URIAction(label='工程師',uri='https://dglinebot.54ucl.com:5000/'),
+                        URIAction(label='使用者',uri='https://dglinebot.54ucl.com:5000/'),
+                        URIAction(label='廠商',uri='https://dglinebot.54ucl.com:5000/')
                     ]
                 ),
-                CarouselColumn(
-                    thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
-                    title='故障排除',
-                    text='請選擇',
-                    actions=[
-                        MessageAction(
-                            label='柴油發電機型號',
-                            text='柴油發電機型號'
-                        ),
-                        MessageAction(
-                            label='錯誤代碼查詢',
-                            text='錯誤代碼查詢'
-                        ),
-                        MessageAction(
-                            label='解決方式查詢',
-                            text='解決方式查詢'
-                        )
-                    ]
-                ),
+                # CarouselColumn(
+                #     thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
+                #     title='故障排除',
+                #     text='請選擇',
+                #     actions=[
+                #         MessageAction(label='柴油發電機型號',text='柴油發電機型號'),
+                #         MessageAction(label='錯誤代碼查詢',text='錯誤代碼查詢'),
+                #         MessageAction(label='解決方式查詢',text='解決方式查詢')
+                #     ]
+                # ),
                 CarouselColumn(
                     thumbnail_image_url='https://i.imgur.com/zGHNzyG.jpg',
                     title='關於我們',
                     text='請選擇',
                     actions=[
-                        URIAction(
-                            label='分享 bot',
-                            uri='https://line.me/R/nv/recommendOA/@425mwzuz'
-                        ),
-                        URIAction(
-                            label='聯絡開發者',
-                            uri='https://github.com/f108118113'
-                        ),
-                        URIAction(
-                            label='聯絡客服',
-                            uri='https://github.com/f108118113'
+                        URIAction(label='分享 bot',uri='https://line.me/R/nv/recommendOA/@425mwzuz'),
+                        URIAction(label='聯絡開發者',uri='https://github.com/f108118113'),
+                        URIAction(label='聯絡客服',uri='https://github.com/f108118113'
                         )
                     ]
                 )
@@ -228,7 +213,7 @@ def handle_message(event):
     # # error handle
     #     raise e
 
-    # cmd = event.message.text.split(" ")
+    
     # if cmd[0] == "即時報表" :
     #     if cmd[1] == "6226":
     #         parseWeb = config_data('Web6226','parseWeb')
@@ -247,37 +232,37 @@ def handle_message(event):
     #     else:
     #         replayMsg = "沒有這個機台"
     #         line_bot_api.reply_message(event.reply_token,TextSendMessage(text=replayMsg))
+    if ((len(cmd)) == 2 )or( cmd == '錯誤代碼查詢'):
+        if cmd[0] == "錯誤代碼" :    
+            reply = cmd[1]
+            with connection.cursor() as cursor:
+                # execute sql and instert data
+                sql = 'select statement from errorcodelist WHERE errorcode = %s'
+                cursor.execute(sql, reply)
+                message = cursor.fetchone()[0]
+                message = "原因為:{}".format(message)
+                connection.commit()
+                #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
+                message = TextSendMessage(text = message)
+                #print(message)
+                line_bot_api.reply_message(event.reply_token, message )
 
-    # if cmd[0] == "錯誤代碼" :    
-    #     reply = cmd[1]
-    #     with connection.cursor() as cursor:
-    #         # execute sql and instert data
-    #         sql = 'select statement from errorcodelist WHERE errorcode = %s'
-    #         cursor.execute(sql, reply)
-    #         message = cursor.fetchone()[0]
-    #         message = "原因為:{}".format(message)
-    #         connection.commit()
-    #         #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
-    #         message = TextSendMessage(text = message)
-    #         #print(message)
-    #         line_bot_api.reply_message(event.reply_token, message )
+    #     if cmd[0] == "解決方式" :
+    #         reply = cmd[1]
+    #         with connection.cursor() as cursor:
+    #             # execute sql command, and insert record
+    #             sql = 'select method from errorcodelist WHERE errorcode = %s'
+    #             cursor.execute(sql, reply)
+    #             message = cursor.fetchone()[0]
+    #             message = "解決方式為:{}".format(message) # ubuntu 18 String CANNOT USE A+B 
+    #             connection.commit()
+    #             #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
+    #             message = TextSendMessage(text = message)
+    #             #print(message)
+    #             line_bot_api.reply_message(event.reply_token, message )
 
-    # if cmd[0] == "解決方式" :
-    #     reply = cmd[1]
-    #     with connection.cursor() as cursor:
-    #         # execute sql command, and insert record
-    #         sql = 'select method from errorcodelist WHERE errorcode = %s'
-    #         cursor.execute(sql, reply)
-    #         message = cursor.fetchone()[0]
-    #         message = "解決方式為:{}".format(message) # ubuntu 18 String CANNOT USE A+B 
-    #         connection.commit()
-    #         #line_bot_api.reply_message(event.reply_token, TextSendMessage(text=message) )
-    #         message = TextSendMessage(text = message)
-    #         #print(message)
-    #         line_bot_api.reply_message(event.reply_token, message )
-
-    # message = TextSendMessage(text="請輸入即時報表 機台號碼、錯誤代碼 代碼編號、解決方式 代碼編號，例如：即時報表 6226")
-    # line_bot_api.reply_message(event.reply_token, message )
+    #     message = TextSendMessage(text="請輸入即時報表 機台號碼、錯誤代碼 代碼編號、解決方式 代碼編號，例如：即時報表 6226")
+    #     line_bot_api.reply_message(event.reply_token, message )
 
 
 
@@ -288,4 +273,4 @@ if __name__ == "__main__":
     #port = int(os.environ.get('PORT', 5000))
     #app.run(host='0.0.0.0', port=port)
     hostname = config_data('DomainName','DN')
-    app.run(host= hostname ,port=443,ssl_context=(ssl_crt,ssl_key))
+    app.run(debug=True,host= hostname ,port=443,ssl_context=(ssl_crt,ssl_key))
